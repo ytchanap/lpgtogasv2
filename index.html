@@ -55,6 +55,9 @@
             <div class="result-item" id="savingLine">
                 💰 每月节约成本: <strong><span id="saving">-</span></strong> 元
             </div>
+            <div class="result-item" id="rateLine">
+                📊 成本节约率: <strong><span id="savingRate">-</span>%</strong>
+            </div>
             <div class="result-item" id="paybackLine">
                 ⏳ 投资回本期: <strong><span id="payback">-</span></strong>
             </div>
@@ -100,6 +103,9 @@
             const lpgMonthlyCost = lpgBottles * lpgPrice;
             const ngMonthlyCost = Math.round(requiredNgVolume * ngPrice);
             const monthlySaving = lpgMonthlyCost - ngMonthlyCost;
+            const savingRate = monthlySaving > 0 ? 
+                Math.round((monthlySaving / lpgMonthlyCost) * 100) : 
+                Math.round((monthlySaving / ngMonthlyCost) * 100);
 
             // 回本期计算
             let paybackPeriod = '∞';
@@ -110,7 +116,7 @@
                 paybackPeriod = years > 0 ? `${years}年${months}月` : `${months}月`;
             }
 
-            // 减碳计算（国家标准参数）
+            // 减碳计算
             const CO2_LPG = 3.1013;   // kg CO2/kg液化气
             const CO2_NG = 1.9643;    // kg CO2/m³天然气
             const annualCarbonKg = (
@@ -123,12 +129,16 @@
             document.getElementById('lpgCost').textContent = lpgMonthlyCost.toLocaleString('zh-CN');
             document.getElementById('ngCost').textContent = ngMonthlyCost.toLocaleString('zh-CN');
             document.getElementById('saving').textContent = Math.abs(monthlySaving).toLocaleString('zh-CN');
+            document.getElementById('savingRate').textContent = Math.abs(savingRate);
             document.getElementById('payback').textContent = paybackPeriod;
             document.getElementById('trees').textContent = trees;
 
-            // 动态颜色设置
-            document.getElementById('savingLine').className = 
-                `result-item ${monthlySaving >= 0 ? 'positive' : 'negative'}`;
+            // 动态样式设置
+            const setStyle = (element, value) => {
+                element.className = `result-item ${value >= 0 ? 'positive' : 'negative'}`;
+            }
+            setStyle(document.getElementById('savingLine'), monthlySaving);
+            setStyle(document.getElementById('rateLine'), savingRate);
             document.getElementById('paybackLine').className = 
                 `result-item ${paybackPeriod !== '∞' ? 'positive' : 'negative'}`;
         }
